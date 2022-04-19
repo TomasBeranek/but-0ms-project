@@ -2,7 +2,7 @@
 % Author  Tomas Beranek <xberan46@stud.fit.vutbr.cz>
 % Brief   Visualization of kinematic string
 % Date    19.4.2022
-% Up2date sources can be found at 
+% Up2date sources can be found at https://github.com/TomasBeranek/but-0ms-project
 
 % values from the first assignment
 l = [2, 1, 0.5];
