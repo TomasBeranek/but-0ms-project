@@ -1,4 +1,4 @@
-% File    project2.m
+% File    src.m
 % Author  Tomas Beranek <xberan46@stud.fit.vutbr.cz>
 % Brief   Visualization of kinematic string
 % Date    19.4.2022
@@ -8,7 +8,7 @@
 l = [2, 1, 0.5];
 a = [[70, -100, -20]; [80, -120, -30]; [90, -140, -50]; [110, -160, -30]];
 
-[num, txt, raw] = xlsread("cv9.xlsx");
+[num, txt, raw] = xlsread("input.xlsx");
 
 % load number of segments and number of strings from .xlsx file
 lengthsNum = raw{2,1};
@@ -28,7 +28,7 @@ raw(7+2*instancesNum,1) = {'Polohy kloubů Y'};
 raw(8+2*instancesNum:7+3*instancesNum, 1:(lengthsNum+1)) = num2cell(y');
 
 % write everything back the original .xslx file
-writecell(raw, "cv9.xlsx", 'UseExcel', false);
+writecell(raw, "input.xlsx", 'UseExcel', false);
 
 function [x] = calculateCoordinate(l, a, coordinateType)
     stringsTotal = size(a,1);
