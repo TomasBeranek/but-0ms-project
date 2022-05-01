@@ -67,8 +67,57 @@ function [x, y] = showKinematicString(l, a)
     % add starting point (0,0) for each string
     x = [zeros(size(a,1), 1), x]';
     y = [zeros(size(a,1), 1), y]';
+    
+    hold on
+    % plot base
+    plot(0,0, '^', MarkerSize=10, MarkerEdgeColor='b', MarkerFaceColor='b');
 
-    plot(x,y,'-o', 'LineWidth', 2, 'MarkerSize', 8, 'MarkerEdgeColor', 'r', 'Color', 'black');
+    % calculate axes for segment
+    segmentAxisLen = 0.2;
+
+    xAxis = [x(1,:); repelem(x(2:end-1,:), 2, 1); x(end,:)];
+    xAxis = reshape(xAxis, 2, numel(xAxis)/2);
+    xOrig = xAxis;
+    xAxis = xAxis(2,:) - xAxis(1,:);
+
+
+    yAxis = [y(1,:); repelem(y(2:end-1,:), 2, 1); y(end,:)];
+    yAxis = reshape(yAxis, 2, numel(yAxis)/2);
+    yOrig = yAxis;
+    yAxis = yAxis(2,:) - yAxis(1,:);
+    
+    l = vecnorm([xAxis; yAxis]);
+
+    xAxis = (xAxis ./ l) * segmentAxisLen;
+    yAxis = (yAxis ./ l) * segmentAxisLen;
+
+    segEndX = xOrig(2,:);
+    segEndY = yOrig(2,:);
+
+    axisEndX = segEndX + xAxis;
+    axisEndY = segEndY + yAxis;
+    
+    % plot segment axes
+    plot([segEndX; axisEndX], [segEndY; axisEndY], '-', LineWidth=2, Color='g');
+
+    % plot movement interpolation
+    endPointsX = x(end,:);
+    
+    minX = min(endPointsX, [], 'all');
+    maxX = max(endPointsX, [], 'all');
+
+    range = minX:0.1:maxX;
+
+    interpolatedPointsY = interp1(x(end,:), y(end,:), range, 'spline');
+    plot(range,interpolatedPointsY,'-', LineWidth=2, Color='m');
+
+    % plot segments
+    plot(x,y,'-o', LineWidth=2 ,MarkerSize=10, MarkerEdgeColor='b', Color='black', MarkerIndices = 2 : length(x) - 1, MarkerFaceColor='b');
+
+    % plot endpoints
+    plot(x(end,:), y(end,:), 'o', MarkerSize=10, MarkerEdgeColor='r', MarkerFaceColor='r');
+    hold off
+
     title('Kinematic Strings');
     xlabel('X Axis');
     ylabel('Y Axis');
