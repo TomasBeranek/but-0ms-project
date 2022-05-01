@@ -4,31 +4,57 @@
 % Date    19.4.2022
 % Up2date sources can be found at https://github.com/TomasBeranek/but-0ms-project
 
-% values from the first assignment
-l = [2, 1, 0.5];
-a = [[70, -100, -20]; [80, -120, -30]; [90, -140, -50]; [110, -160, -30]];
+file = "manipulator.xlsx";
 
-[num, txt, raw] = xlsread("input.xlsx");
+[num, txt, raw] = xlsread(file);
 
 % load number of segments and number of strings from .xlsx file
-lengthsNum = raw{2,1};
-instancesNum = raw{2,2};
+lengthsNum = raw{2,3};
+instancesNum = raw{3,3};
+
+assert(~isnan(lengthsNum), "ERROR: Incorrect format of number of lengths!");
+assert(~isnan(instancesNum), "ERROR: Incorrect format of number of instances!");
 
 % load lengths and angles from .xlsx file
-l = cell2mat(raw(4, 1:lengthsNum));
-a = cell2mat(raw(6:5+instancesNum, 1:lengthsNum));
+try
+    l = cell2mat(raw(6, 3:lengthsNum+2));
+catch E
+    if (E.identifier == 'MATLAB:cell2mat:MixedDataTypes')
+        error("ERROR: Incorrect format of lengths!");
+    end
+end
+
+try
+    a = cell2mat(raw(8:instancesNum+7, 3:lengthsNum+2));
+catch E
+    if (E.identifier == 'MATLAB:cell2mat:MixedDataTypes')
+        error("ERROR: Incorrect format of instances!");
+    end
+end
+
+% to catch missing values and
+assert(~sum(isnan(l)), "ERROR: Incorrect format of lengths!");
+assert(~sum(isnan(a), 'all'), "ERROR: Incorrect format of instances!");
+
+% check that length is a positive non-zero number
+l(l <= 0) = nan;
+assert(~sum(isnan(l)), "ERROR: Atleast one segment has zero length!");
 
 % calculate joint coordinates and display them in a graph
 [x,y] = showKinematicString(l,a);
 
+% clear contents
+raw(instancesNum+8:end, 1:end) = {nan};
+
 % safe results
-raw(6+instancesNum,1) = {'Polohy kloubů X'};
-raw(7+instancesNum:6+2*instancesNum, 1:(lengthsNum + 1)) = num2cell(x');
-raw(7+2*instancesNum,1) = {'Polohy kloubů Y'};
-raw(8+2*instancesNum:7+3*instancesNum, 1:(lengthsNum+1)) = num2cell(y');
+raw(instancesNum+9,3) = {'polohy počátků ramen'};
+raw(instancesNum+10,1) = {'x'};
+raw(instancesNum*2+10)  = {'y'};
+raw(instancesNum+10:instancesNum*2+9, 2:(lengthsNum+2)) = num2cell(x');
+raw(instancesNum*2+10:instancesNum*3+9,2:(lengthsNum+2)) = num2cell(y');
 
 % write everything back the original .xslx file
-writecell(raw, "input.xlsx", 'UseExcel', false);
+writecell(raw, file, 'UseExcel', false);
 
 function [x] = calculateCoordinate(l, a, coordinateType)
     stringsTotal = size(a,1);
