@@ -46,7 +46,7 @@ assert(~sum(isnan(l)), "ERROR: Atleast one segment has zero length!");
 % clear contents
 raw(instancesNum+8:end, 1:end) = {nan};
 
-% safe results
+% save results
 raw(instancesNum+9,3) = {'polohy počátků ramen'};
 raw(instancesNum+10,1) = {'x'};
 raw(instancesNum*2+10)  = {'y'};
